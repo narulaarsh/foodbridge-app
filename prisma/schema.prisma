@@ -1,0 +1,51 @@
+// FoodBridge Prisma Schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  role         String     // 'Donor', 'Volunteer', 'Admin'
+  name         String
+  email        String     @unique
+  passwordHash String
+
+  donations    Donation[]
+  pickups      Pickup[]
+}
+
+model Donation {
+  id         Int      @id @default(autoincrement())
+  donorId    Int
+  foodTitle  String
+  quantityKg Float
+  expiryTime DateTime
+  status       String   @default("Available") // 'Available', 'Reserved', 'PickedUp'
+  lat          Float
+  lng          Float
+  address      String?  
+  instructions String?
+
+  donor      User     @relation(fields: [donorId], references: [id])
+  pickup     Pickup?
+}
+
+model Pickup {
+  id          Int       @id @default(autoincrement())
+  donationId  Int       @unique
+  volunteerId Int
+  otpCode     Int
+  claimTime   DateTime  @default(now())
+  finishTime  DateTime?
+
+  donation    Donation  @relation(fields: [donationId], references: [id])
+  volunteer   User      @relation(fields: [volunteerId], references: [id])
+}
