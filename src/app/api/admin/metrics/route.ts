@@ -23,22 +23,50 @@ export async function GET() {
       where: { status: "Available" }
     });
 
+    const reservedDonations = await prisma.donation.count({
+      where: { status: "Reserved" }
+    });
+
+    const completedDonations = await prisma.donation.count({
+      where: { status: "PickedUp" }
+    });
+
+    const totalDonations = await prisma.donation.count();
+
     const foodRescuedAggregate = await prisma.donation.aggregate({
-      _sum: {
-        quantityKg: true
-      },
-      where: {
-        status: "PickedUp"
-      }
+      _sum: { quantityKg: true },
+      where: { status: "PickedUp" }
+    });
+
+    const totalFoodPosted = await prisma.donation.aggregate({
+      _sum: { quantityKg: true }
     });
 
     const totalFoodRescued = foodRescuedAggregate._sum.quantityKg || 0;
+
+    const donorCount = await prisma.user.count({ where: { role: "Donor" } });
+    const volunteerCount = await prisma.user.count({ where: { role: "Volunteer" } });
+    const adminCount = await prisma.user.count({ where: { role: "Admin" } });
+
+    const totalPickups = await prisma.pickup.count();
+    const completedPickups = await prisma.pickup.count({
+      where: { finishTime: { not: null } }
+    });
 
     return NextResponse.json({ 
       metrics: {
         totalUsers,
         activeDonations,
-        totalFoodRescued
+        reservedDonations,
+        completedDonations,
+        totalDonations,
+        totalFoodRescued,
+        totalFoodPosted: totalFoodPosted._sum.quantityKg || 0,
+        donorCount,
+        volunteerCount,
+        adminCount,
+        totalPickups,
+        completedPickups,
       }
     }, { status: 200 });
   } catch (error: any) {
