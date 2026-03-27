@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 function AuthForm() {
   const router = useRouter();
@@ -54,13 +55,11 @@ function AuthForm() {
 
       if (res.ok) {
         if (isLogin || isSetupRole) {
-          // Redirect to appropriate dashboard based on role
           const userRole = data.user.role;
           router.push(`/${userRole.toLowerCase()}`);
         } else {
-          // After successful manual registration, switch to login view
           setIsLogin(true);
-          setPassword(""); // clear password for security
+          setPassword("");
           setAdminSecret("");
         }
       } else {
@@ -74,133 +73,115 @@ function AuthForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 dark:bg-gray-950">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4 relative overflow-hidden">
       
-      {/* Animated Gradient Background Wrapper */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-amber-500/20 via-orange-500/10 to-emerald-500/20 dark:from-amber-900/40 dark:via-orange-900/20 dark:to-emerald-900/40 animate-gradient-xy"></div>
-        {/* Abstract Blur Blobs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-400/30 dark:bg-amber-600/20 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-3xl opacity-70 animate-blob"></div>
-        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-emerald-400/30 dark:bg-emerald-600/20 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-32 left-1/2 w-96 h-96 bg-orange-400/30 dark:bg-orange-600/20 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div>
+      {/* Glow effects */}
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[150px] pointer-events-none"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-emerald-500/8 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/5 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="w-full max-w-md z-10">
         
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-2">
-            <svg className="w-10 h-10 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-            FoodBridge
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 font-medium">Rescue surplus food, fight hunger.</p>
+          <Link href="/" className="inline-flex items-center gap-2.5 group mb-3">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/25 group-hover:shadow-amber-500/40 transition-shadow">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <span className="text-3xl font-extrabold text-white tracking-tight">FoodBridge</span>
+          </Link>
+          <p className="text-gray-500 font-medium text-sm">Rescue surplus food, fight hunger.</p>
         </div>
 
-        {/* Auth Card - Glassmorphism */}
-        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800 p-8 sm:p-10 transition-all duration-300 hover:shadow-amber-500/10">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+        {/* Auth Card */}
+        <div className="bg-white/[0.04] backdrop-blur-xl rounded-3xl border border-white/[0.08] p-8 sm:p-10 shadow-2xl">
+          <h2 className="text-xl font-bold text-white mb-1.5 text-center">
             {isSetupRole ? "Complete Registration" : isLogin ? "Welcome Back" : "Create an Account"}
           </h2>
-          
-          {isSetupRole && (
-            <p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-6">
-              You're almost there! Simply select your role to complete your Google registration.
-            </p>
-          )}
+          <p className="text-center text-sm text-gray-500 mb-6">
+            {isSetupRole 
+              ? "Select your role to complete Google registration." 
+              : isLogin 
+                ? "Sign in to access your dashboard." 
+                : "Join FoodBridge and make a difference."}
+          </p>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-700 bg-red-100/80 border border-red-200 rounded-xl dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 flex items-center gap-2 font-medium">
-                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+              <div className="p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-2 font-medium">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 {error}
               </div>
             )}
 
             {!isLogin && !isSetupRole && (
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Full Name</label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
-                  placeholder="John Doe"
-                />
+              <div>
+                <label className="text-xs font-semibold text-gray-400 mb-1.5 block uppercase tracking-wider">Full Name</label>
+                <input type="text" required value={name} onChange={(e) => setName(e.target.value)}
+                  className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] text-white rounded-xl focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 outline-none transition-all placeholder-gray-600"
+                  placeholder="John Doe" />
               </div>
             )}
 
             {!isSetupRole && (
               <>
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Email Address</label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
-                    placeholder="you@example.com"
-                  />
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 mb-1.5 block uppercase tracking-wider">Email Address</label>
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] text-white rounded-xl focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 outline-none transition-all placeholder-gray-600"
+                    placeholder="you@example.com" />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Password</label>
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
-                    placeholder="••••••••"
-                  />
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 mb-1.5 block uppercase tracking-wider">Password</label>
+                  <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] text-white rounded-xl focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 outline-none transition-all placeholder-gray-600"
+                    placeholder="••••••••" />
                 </div>
               </>
             )}
 
             {!isLogin && (
-              <div className="space-y-1 relative">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">I want to join as a:</label>
-                <div className="relative">
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none appearance-none cursor-pointer transition-all"
-                  >
-                    <option value="Donor">Donor (Post Food)</option>
-                    <option value="Volunteer">Volunteer (Deliver Food)</option>
-                    <option value="Admin">Admin (Manage Platform)</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                  </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-400 mb-1.5 block uppercase tracking-wider">I want to join as</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { value: "Donor", label: "Donor", icon: "M12 6v6m0 0v6m0-6h6m-6 0H6", desc: "Post Food" },
+                    { value: "Volunteer", label: "Volunteer", icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z", desc: "Deliver" },
+                    { value: "Admin", label: "Admin", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", desc: "Manage" },
+                  ].map((r) => (
+                    <button
+                      key={r.value}
+                      type="button"
+                      onClick={() => setRole(r.value)}
+                      className={`flex flex-col items-center gap-1 p-3 rounded-xl border transition-all text-center ${
+                        role === r.value
+                          ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                          : "bg-white/[0.02] border-white/[0.06] text-gray-500 hover:bg-white/[0.04] hover:text-gray-300"
+                      }`}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={r.icon}></path></svg>
+                      <span className="text-xs font-bold">{r.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* Secret Dropdown for Admins explicitly securely */}
             {!isLogin && role === "Admin" && (
-              <div className="space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
-                <label className="text-sm font-bold text-indigo-700 dark:text-indigo-400 ml-1 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+              <div>
+                <label className="text-xs font-bold text-indigo-400 mb-1.5 block uppercase tracking-wider flex items-center gap-1">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                   Admin Secret Key
                 </label>
-                <input
-                  type="password"
-                  required
-                  value={adminSecret}
-                  onChange={(e) => setAdminSecret(e.target.value)}
-                  className="w-full px-4 py-3 bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/50 text-indigo-900 dark:text-indigo-100 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-indigo-300 dark:placeholder-indigo-700"
-                  placeholder="Enter authorized key"
-                />
+                <input type="password" required value={adminSecret} onChange={(e) => setAdminSecret(e.target.value)}
+                  className="w-full px-4 py-3 bg-indigo-500/5 border border-indigo-500/20 text-white rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 outline-none transition-all placeholder-indigo-800"
+                  placeholder="Enter authorized key" />
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg shadow-amber-500/30 dark:shadow-amber-900/20 hover:shadow-xl hover:-translate-y-0.5 transform transition-all duration-200 outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            >
+            <button type="submit" disabled={loading}
+              className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0 mt-2">
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -209,21 +190,15 @@ function AuthForm() {
                   </svg>
                   Processing...
                 </span>
-              ) : isSetupRole ? (
-                "Complete Registration"
-              ) : isLogin ? (
-                "Sign in"
-              ) : (
-                "Create Account"
-              )}
+              ) : isSetupRole ? "Complete Registration" : isLogin ? "Sign in" : "Create Account"}
             </button>
 
             {!isSetupRole && (
               <>
-                <div className="relative flex items-center py-2">
-                  <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-                  <span className="flex-shrink-0 mx-4 text-gray-400 dark:text-gray-500 text-sm font-medium">Or</span>
-                  <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+                <div className="relative flex items-center py-1">
+                  <div className="flex-grow border-t border-white/[0.06]"></div>
+                  <span className="flex-shrink-0 mx-4 text-gray-600 text-xs font-bold uppercase tracking-wider">Or</span>
+                  <div className="flex-grow border-t border-white/[0.06]"></div>
                 </div>
 
                 <button
@@ -233,7 +208,7 @@ function AuthForm() {
                     window.location.href = "/api/auth/google";
                   }}
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white font-semibold rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-white/[0.04] hover:bg-white/[0.08] text-white font-semibold rounded-xl border border-white/[0.08] hover:border-white/[0.12] transition-all disabled:opacity-50"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -249,8 +224,8 @@ function AuthForm() {
           </form>
 
           {!isSetupRole && (
-            <div className="mt-8 text-center text-sm">
-              <span className="text-gray-500 dark:text-gray-400">
+            <div className="mt-6 text-center text-sm">
+              <span className="text-gray-500">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}
               </span>{" "}
               <button
@@ -258,7 +233,7 @@ function AuthForm() {
                   setIsLogin(!isLogin);
                   setError("");
                 }}
-                className="text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 font-bold underline decoration-2 underline-offset-2 transition-colors focus:outline-none"
+                className="text-amber-400 hover:text-amber-300 font-bold transition-colors"
               >
                 {isLogin ? "Join FoodBridge" : "Log in"}
               </button>
@@ -272,7 +247,7 @@ function AuthForm() {
 
 export default function AuthPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center dark:bg-gray-950 text-white">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">Loading...</div>}>
       <AuthForm />
     </Suspense>
   );
